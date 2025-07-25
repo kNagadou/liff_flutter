@@ -25,11 +25,9 @@ void main() {
     // Verify that our app shows the correct title
     expect(find.text('LIFF Flutter Sample'), findsOneWidget);
 
-    // Verify that LIFF設定 section exists
-    expect(find.text('LIFF設定'), findsOneWidget);
-
-    // Verify that the LIFF ID is displayed
-    expect(find.text('LIFF ID'), findsOneWidget);
+    // Verify that environment configuration is displayed
+    expect(find.text('環境変数から自動設定'), findsOneWidget);
+    expect(find.text('GitHub Secrets で管理'), findsOneWidget);
 
     // Verify that the open LIFF app button exists
     expect(find.text('LIFFアプリを開く'), findsOneWidget);

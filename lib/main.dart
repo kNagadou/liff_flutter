@@ -118,22 +118,19 @@ class _MyHomePageState extends State<MyHomePage> {
                           border: Border.all(color: Colors.grey),
                           borderRadius: BorderRadius.circular(4),
                         ),
-                        child: Column(
+                        child: const Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              'LIFF ID',
+                            Text(
+                              'LIFF設定',
                               style: TextStyle(
                                 fontSize: 12,
                                 color: Colors.grey,
                               ),
                             ),
+                            Text('環境変数から自動設定', style: TextStyle(fontSize: 16)),
                             Text(
-                              LiffService.getLiffId(),
-                              style: const TextStyle(fontSize: 16),
-                            ),
-                            const Text(
-                              '固定設定',
+                              'GitHub Secrets で管理',
                               style: TextStyle(
                                 fontSize: 12,
                                 color: Colors.grey,
@@ -225,7 +222,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       const SizedBox(height: 8),
                       const Text(
                         '1. LINE Developers コンソールでLIFFアプリを作成\n'
-                        '2. 取得したLIFF IDを上記に入力\n'
+                        '2. LIFF IDを環境変数またはGitHub Secretsに設定\n'
                         '3. "LIFFアプリを開く"ボタンをタップ\n'
                         '4. LINEでログインしてアプリを使用',
                         textAlign: TextAlign.left,
