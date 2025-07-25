@@ -67,6 +67,44 @@ dependencies:
   shared_preferences: ^2.2.2
 ```
 
+## デプロイメント
+
+### GitHub Pages でのデプロイ
+
+このアプリはGitHub Pagesに自動デプロイされます。
+
+#### 設定手順
+
+1. **GitHub Secretsの設定**
+   - リポジトリの Settings → Secrets and variables → Actions
+   - `LIFF_ID` シークレットを追加
+
+2. **GitHub Pagesの有効化**
+   - リポジトリの Settings → Pages
+   - Source: "GitHub Actions" を選択
+
+3. **自動デプロイ**
+   - `main` ブランチにプッシュすると自動的にビルド・デプロイされます
+   - デプロイ状況は Actions タブで確認できます
+
+#### アクセス URL
+```
+https://knagadou.github.io/liff_flutter/
+```
+
+#### デプロイワークフロー
+- `.github/workflows/deploy-pages.yml` でビルド・デプロイを自動化
+- Flutter Web ビルド（`--base-href /liff_flutter/` 付き）
+- GitHub Pages への自動デプロイ
+
+### ローカルでのWebサーバー起動
+
+開発中にローカルでWebサーバーを起動する場合：
+
+```bash
+flutter run -d web-server --web-port 8080 --dart-define=LIFF_ID=your-liff-id
+```
+
 ## 使用方法
 
 1. アプリを起動

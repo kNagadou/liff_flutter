@@ -1,14 +1,12 @@
-name: Build Flutter App
+name: Build and Test Flutter App
 
 on:
-  push:
-    branches: [ main ]
   pull_request:
     branches: [ main ]
   workflow_dispatch:
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
 
     steps:
@@ -18,6 +16,7 @@ jobs:
       uses: subosito/flutter-action@v2
       with:
         flutter-version: '3.32.5'
+        cache: true
 
     - name: Install dependencies
       run: flutter pub get
@@ -28,24 +27,13 @@ jobs:
     - name: Run tests
       run: flutter test
 
-    - name: Build web app
-      run: flutter build web --dart-define=LIFF_ID=${{ secrets.LIFF_ID }}
+    - name: Test web build
+      run: flutter build web --dart-define=LIFF_ID=test-liff-id
       env:
-        LIFF_ID: ${{ secrets.LIFF_ID }}
+        LIFF_ID: test-liff-id
 
-    - name: Build Android APK
-      run: flutter build apk --dart-define=LIFF_ID=${{ secrets.LIFF_ID }}
+    - name: Test Android build
+      run: flutter build apk --dart-define=LIFF_ID=test-liff-id
       env:
-        LIFF_ID: ${{ secrets.LIFF_ID }}
-
-    - name: Upload web artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: web-build
-        path: build/web/
-
-    - name: Upload Android artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: android-apk
+        LIFF_ID: test-liff-id
         path: build/app/outputs/flutter-apk/app-release.apk
