@@ -18,6 +18,7 @@ class _LiffPageState extends State<LiffPage> {
   String? _errorMessage;
   String _environment = 'Unknown';
   final TextEditingController _messageController = TextEditingController();
+  Map<String, dynamic>? _locationData;
 
   @override
   void initState() {
@@ -169,6 +170,46 @@ class _LiffPageState extends State<LiffPage> {
           context,
         ).showSnackBar(SnackBar(content: Text('QRスキャンエラー: $e')));
       }
+    }
+  }
+
+  Future<void> _getCurrentLocation() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final locationData = await LiffService.getCurrentLocation();
+      setState(() {
+        _locationData = locationData;
+      });
+
+      if (locationData != null && locationData.containsKey('error')) {
+        if (mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(locationData['error'])));
+        }
+      } else if (locationData != null && mounted) {
+        final latitude = locationData['latitude'];
+        final longitude = locationData['longitude'];
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('位置情報を取得しました\n緯度: $latitude\n経度: $longitude'),
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('位置情報取得エラー: $e')));
+      }
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -333,6 +374,68 @@ class _LiffPageState extends State<LiffPage> {
 
             const SizedBox(height: 16),
 
+            // 位置情報カード
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '位置情報',
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
+                    const SizedBox(height: 16),
+                    if (_locationData != null &&
+                        !_locationData!.containsKey('error')) ...[
+                      _buildLocationItem(
+                        '緯度',
+                        _locationData!['latitude']?.toString(),
+                      ),
+                      _buildLocationItem(
+                        '経度',
+                        _locationData!['longitude']?.toString(),
+                      ),
+                      _buildLocationItem(
+                        '精度',
+                        '${_locationData!['accuracy']?.toStringAsFixed(1)}m',
+                      ),
+                      _buildLocationItem(
+                        '高度',
+                        '${_locationData!['altitude']?.toStringAsFixed(1)}m',
+                      ),
+                      if (_locationData!['speed'] != null &&
+                          _locationData!['speed'] > 0)
+                        _buildLocationItem(
+                          '速度',
+                          '${(_locationData!['speed'] * 3.6).toStringAsFixed(1)}km/h',
+                        ),
+                      if (_locationData!['timestamp'] != null)
+                        _buildLocationItem(
+                          '取得時刻',
+                          DateTime.parse(
+                            _locationData!['timestamp'],
+                          ).toLocal().toString().split('.')[0],
+                        ),
+                    ] else ...[
+                      const Text('位置情報が取得されていません'),
+                    ],
+                    const SizedBox(height: 16),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: _getCurrentLocation,
+                        icon: const Icon(Icons.location_on),
+                        label: const Text('現在地を取得'),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
             // アクションボタン
             Card(
               child: Padding(
@@ -399,6 +502,25 @@ class _LiffPageState extends State<LiffPage> {
             ),
           ),
           Expanded(child: Text(value ?? '未設定')),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLocationItem(String label, String? value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 80,
+            child: Text(
+              '$label:',
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ),
+          Expanded(child: Text(value ?? '未取得')),
         ],
       ),
     );

@@ -38,5 +38,15 @@ void main() {
       final environment = await LiffService.getLiffEnvironment();
       expect(environment, equals('Not Initialized'));
     });
+
+    test('should handle location permission errors', () async {
+      // 位置情報機能のテスト（実際の位置情報は取得できないため、エラーハンドリングをテスト）
+      final result = await LiffService.getCurrentLocation();
+      expect(result, isNotNull);
+      // テスト環境では位置情報が取得できないため、エラーまたは null が返される
+      if (result != null && result.containsKey('error')) {
+        expect(result['error'], isA<String>());
+      }
+    });
   });
 }

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_line_liff/flutter_line_liff.dart';
+import 'package:geolocator/geolocator.dart' as geo;
 
 class LiffService {
   // LIFF IDを環境変数から取得
@@ -256,6 +257,55 @@ class LiffService {
       }
     } catch (e) {
       return 'Unknown';
+    }
+  }
+
+  // 位置情報取得
+  static Future<Map<String, dynamic>?> getCurrentLocation() async {
+    try {
+      // 位置情報サービスが有効かチェック
+      bool serviceEnabled = await geo.Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        log('位置情報サービスが無効です');
+        return {'error': '位置情報サービスが無効です。設定から位置情報を有効にしてください。'};
+      }
+
+      // 位置情報の権限チェック
+      geo.LocationPermission permission =
+          await geo.Geolocator.checkPermission();
+      if (permission == geo.LocationPermission.denied) {
+        permission = await geo.Geolocator.requestPermission();
+        if (permission == geo.LocationPermission.denied) {
+          log('位置情報の権限が拒否されました');
+          return {'error': '位置情報の権限が拒否されました。設定から権限を許可してください。'};
+        }
+      }
+
+      if (permission == geo.LocationPermission.deniedForever) {
+        log('位置情報の権限が永続的に拒否されました');
+        return {'error': '位置情報の権限が永続的に拒否されています。設定から権限を許可してください。'};
+      }
+
+      // 現在位置を取得
+      geo.Position position = await geo.Geolocator.getCurrentPosition(
+        desiredAccuracy: geo.LocationAccuracy.high,
+        timeLimit: const Duration(seconds: 10),
+      );
+
+      log('位置情報取得成功: 緯度=${position.latitude}, 経度=${position.longitude}');
+
+      return {
+        'latitude': position.latitude,
+        'longitude': position.longitude,
+        'accuracy': position.accuracy,
+        'altitude': position.altitude,
+        'heading': position.heading,
+        'speed': position.speed,
+        'timestamp': position.timestamp.toIso8601String(),
+      };
+    } catch (e) {
+      log('位置情報取得エラー: $e');
+      return {'error': '位置情報の取得に失敗しました: $e'};
     }
   }
 }
