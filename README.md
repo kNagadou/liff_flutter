@@ -2,15 +2,15 @@
 
 FlutterでLINE LIFF（LINE Front-end Framework）を使用するサンプルアプリケーションです。
 
-> **注意**: このアプリは`flutter_line_liff`パッケージを使用していますが、実際のLIFF機能はシミュレーションで実装されています。実際のLINE環境での動作確認が必要です。
+このアプリは`flutter_line_liff`パッケージを使用してLIFF機能を実装しています。
 
 ## 機能
 
-- LIFF初期化のシミュレーション
-- LINEユーザーのログイン/ログアウト（シミュレーション）
+- LIFF初期化
+- LINEユーザーのログイン/ログアウト
 - ユーザープロフィール情報の表示
-- LINEトークへのメッセージ送信（シミュレーション）
-- QRコードスキャン機能（シミュレーション）
+- LINEトークへのメッセージ送信（制限あり）
+- QRコードスキャン機能
 - ローカルストレージでのユーザー情報保存
 
 ## セットアップ
@@ -26,10 +26,36 @@ FlutterでLINE LIFF（LINE Front-end Framework）を使用するサンプルア�
    - エンドポイントURL: `https://your-domain.com`
    - Scope: `profile` と `openid` を選択
 
-### 2. LIFF IDの設定
+### 2. 環境変数の設定
 
-1. 作成したLIFFアプリからLIFF IDをコピー
-2. アプリ内でLIFF IDを入力して使用
+このアプリケーションは LIFF_ID を環境変数から取得します。
+
+#### GitHub Secrets の設定（本番環境）
+
+1. GitHubリポジトリの Settings → Secrets and variables → Actions
+2. 新しいリポジトリシークレットを追加:
+   - Name: `LIFF_ID`
+   - Secret: あなたのLIFF ID
+
+#### ローカル開発環境の設定
+
+以下のいずれかの方法でLIFF_IDを設定してください：
+
+**方法1: コマンドライン実行**
+```bash
+flutter run --dart-define=LIFF_ID=your-liff-id-here
+```
+
+**方法2: VS Code デバッグ設定**
+VS Codeのデバッグ設定で「liff_flutter (development)」を選択して実行
+
+**方法3: 環境変数ファイル**
+プロジェクトルートに `.env` ファイルを作成（Git管理外）：
+```
+LIFF_ID=your-liff-id-here
+```
+
+詳細な設定方法は [ENVIRONMENT_SETUP.md](ENVIRONMENT_SETUP.md) を参照してください。
 
 ### 3. 必要な依存関係
 

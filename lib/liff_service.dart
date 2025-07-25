@@ -4,8 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_line_liff/flutter_line_liff.dart';
 
 class LiffService {
-  // LIFF IDをハードコード
-  static const String _liffId = '2007733449-yeav9Nz9';
+  // LIFF IDを環境変数から取得
+  static const String _liffId = String.fromEnvironment('LIFF_ID');
   static bool _isInitialized = false;
   static Map<String, dynamic>? _profile;
   static String? _accessToken;
@@ -13,12 +13,20 @@ class LiffService {
 
   // LIFF IDを取得
   static String getLiffId() {
+    if (_liffId.isEmpty) {
+      throw Exception('LIFF_ID environment variable is not set');
+    }
     return _liffId;
   }
 
   // LIFF初期化
   static Future<bool> init() async {
     try {
+      // LIFF IDの存在チェック
+      if (_liffId.isEmpty) {
+        throw Exception('LIFF_ID environment variable is not set');
+      }
+
       // SharedPreferencesから保存された情報を取得
       final prefs = await SharedPreferences.getInstance();
       _accessToken = prefs.getString('liff_access_token');
