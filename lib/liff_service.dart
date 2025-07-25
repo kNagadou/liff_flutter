@@ -212,12 +212,6 @@ class LiffService {
     }
 
     try {
-      // QRコードスキャン機能が利用可能かチェック
-      if (!_liff!.isApiAvailable(apiName: 'scanCode')) {
-        log('QRコードスキャン機能は利用できません');
-        return null;
-      }
-
       final result = await _liff!.scanCodeV2();
       return result.value;
     } catch (e) {
