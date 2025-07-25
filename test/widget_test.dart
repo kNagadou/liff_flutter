@@ -9,22 +9,69 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:liff_flutter/main.dart';
+import 'test_setup.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
+  // テスト環境のセットアップ
+  setupTestEnvironment();
+
+  testWidgets('LIFF Flutter app smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
     await tester.pumpWidget(const MyApp());
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    // Wait for initialization to complete
+    await tester.pumpAndSettle();
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    // Verify that our app shows the correct title
+    expect(find.text('LIFF Flutter Sample'), findsOneWidget);
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    // Verify that LIFF設定 section exists
+    expect(find.text('LIFF設定'), findsOneWidget);
+
+    // Verify that the LIFF ID is displayed
+    expect(find.text('LIFF ID'), findsOneWidget);
+
+    // Verify that the open LIFF app button exists
+    expect(find.text('LIFFアプリを開く'), findsOneWidget);
+
+    // Verify that status section exists
+    expect(find.text('ステータス'), findsOneWidget);
+  });
+
+  testWidgets('LIFF app navigation test', (WidgetTester tester) async {
+    // Build our app and trigger a frame.
+    await tester.pumpWidget(const MyApp());
+
+    // Wait for initialization to complete
+    await tester.pumpAndSettle();
+
+    // Find and tap the "LIFFアプリを開く" button
+    final openButton = find.text('LIFFアプリを開く');
+    expect(openButton, findsOneWidget);
+
+    await tester.tap(openButton);
+    await tester.pumpAndSettle();
+
+    // Verify that we navigated to the LIFF page
+    // In test mode, this should work without errors
+    expect(find.byType(Scaffold), findsWidgets);
+  });
+
+  testWidgets('App displays initialization status', (
+    WidgetTester tester,
+  ) async {
+    // Build our app and trigger a frame.
+    await tester.pumpWidget(const MyApp());
+
+    // Wait for the app to settle
+    await tester.pumpAndSettle(const Duration(seconds: 3));
+
+    // Check that status information is displayed
+    expect(find.text('LIFF初期化'), findsOneWidget);
+    expect(find.text('ログイン状態'), findsOneWidget);
+
+    // Check that status values are displayed
+    expect(find.text('完了'), findsOneWidget); // LIFF初期化: 完了
+    expect(find.text('未ログイン'), findsOneWidget); // ログイン状態: 未ログイン
   });
 }

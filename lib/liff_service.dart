@@ -5,15 +5,29 @@ import 'package:flutter_line_liff/flutter_line_liff.dart';
 
 class LiffService {
   // LIFF IDを環境変数から取得
-  static const String _liffId = String.fromEnvironment('LIFF_ID');
+  static const String _liffId = String.fromEnvironment(
+    'LIFF_ID',
+    defaultValue: 'test-liff-id',
+  );
   static bool _isInitialized = false;
   static Map<String, dynamic>? _profile;
   static String? _accessToken;
   static FlutterLineLiff? _liff;
 
+  // テスト用フラグ
+  static bool _isTestMode = false;
+
+  // テスト用の設定
+  static void setTestMode(bool testMode) {
+    _isTestMode = testMode;
+  }
+
   // LIFF IDを取得
   static String getLiffId() {
-    if (_liffId.isEmpty) {
+    if (_isTestMode && _liffId == 'test-liff-id') {
+      return 'test-liff-id';
+    }
+    if (_liffId.isEmpty || _liffId == 'test-liff-id') {
       throw Exception('LIFF_ID environment variable is not set');
     }
     return _liffId;
@@ -22,8 +36,14 @@ class LiffService {
   // LIFF初期化
   static Future<bool> init() async {
     try {
+      // テストモードの場合はモック初期化
+      if (_isTestMode) {
+        _isInitialized = true;
+        return true;
+      }
+
       // LIFF IDの存在チェック
-      if (_liffId.isEmpty) {
+      if (_liffId.isEmpty || _liffId == 'test-liff-id') {
         throw Exception('LIFF_ID environment variable is not set');
       }
 
